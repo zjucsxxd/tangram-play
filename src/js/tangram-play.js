@@ -21,6 +21,7 @@ import ErrorsManager from './editor/errors';
 import GlslHelpers from './glsl/helpers';
 import ColorPalette from './widgets/color-palette';
 import LocalStorage from './storage/localstorage';
+import Tabs from './ui/tabs';
 
 // Import Utils
 import { subscribeMixin } from './tools/mixin';
@@ -97,6 +98,8 @@ class TangramPlay {
     initAddons () {
         this.addons.widgetsManager = new WidgetsManager('data/tangram-api.json');
         this.addons.suggestManager = new SuggestManager('data/tangram-api.json');
+        this.addons.tabs = new Tabs();
+
         // this.addons.glslSandbox = new GlslSandbox();
         this.addons.glslHelpers = new GlslHelpers();
         this.addons.errorsManager = new ErrorsManager();

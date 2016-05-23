@@ -38,6 +38,9 @@
 /* + Suggest */
 @import '_suggest';
 
+/* + Multi tabs */
+@import '_tabs';
+
 /* + GLSL Sandbox */
 @import '_sandbox';
 
