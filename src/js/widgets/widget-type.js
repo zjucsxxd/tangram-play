@@ -56,6 +56,7 @@ export default class WidgetType {
                 break;
             case 'yaml':
                 widgetObj = new YamlButton(this, keyPair);
+                console.log('IMPORT',widgetObj)
                 break;
             default:
                 // Nothing

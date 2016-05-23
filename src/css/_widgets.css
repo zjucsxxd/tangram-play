@@ -10,6 +10,19 @@
     margin-bottom: 0;
 }
 
+.widget-yaml {
+    color: white;
+    border: 1px solid rgba(255,255,255,0.15);
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    background-color: var(--ui-element-color);
+    cursor: pointer;
+    /* position override */
+    vertical-align: middle;
+    /*text-align: center;*/
+}
+
 .widget-colorpicker {
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 50%;

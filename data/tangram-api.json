@@ -208,7 +208,7 @@
         {
             "address": "^/import$",
             "type": "yaml",
-            "value": "\\.yaml$"
+            "value": "^[\\w\\W]*\\.yaml$"
         },
         {
             "address": "^/scene/background/color$",
