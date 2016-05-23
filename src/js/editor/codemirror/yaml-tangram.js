@@ -280,13 +280,17 @@ export function parseYamlString(string, state, tabSize) {
     let regex = /(^\s*)([\w|\-|\_]+)(\s*:\s*)([\w|\W]*)\s*$/gm;
     let node = regex.exec(string);
 
-    // node[0] = all the matching line
-    // node[1] = spaces
-    // node[2] = key
-    // node[3] = "\s*:\s*"
-    // node[4] = value (if there is one)
-    //
+    let array_regex = /(^\s*)(\-\s*)([\w|\W]*)\s*$/gm;
+    let array = array_regex.exec(string);
+    
     if (node) {
+        // node[0] = all the matching line
+        // node[1] = spaces
+        // node[2] = key
+        // node[3] = "\s*:\s*"
+        // node[4] = value (if there is one)
+        //
+
         //  If looks like a node
         //  Calculate the number of spaces and indentation level
         let spaces = (node[1].match(/\s/g) || []).length;
@@ -356,6 +360,38 @@ export function parseYamlString(string, state, tabSize) {
                     to: {
                         line: state.line,
                         ch: toCh }
+                },
+                index: 0
+            } ];
+        }
+    }
+    else if (array) {
+        // array[0] = all the matching line
+        // array[1] = spaces
+        // array[2] = "-\s*"
+        // array[3] = value (if there is one)
+        //
+        console.log(array)
+        //  If looks like an array element
+        //  Calculate the number of spaces and indentation level
+        let spaces = (array[1].match(/\s/g) || []).length;
+        let level = Math.floor(spaces / tabSize);
+
+        let anchor = getAnchorFromValue(array[3]);
+
+        if (level === state.keyLevel + 1) {
+                state.nodes = [ {
+                address: getAddressFromKeys(state.keyStack),
+                key: state.keyStack[state.keyStack.length-1],
+                anchor: anchor,
+                value: array[3].substr(anchor.length),
+                range: {
+                    from: {
+                        line: state.line,
+                        ch: spaces + array[2].length },
+                    to: {
+                        line: state.line,
+                        ch: spaces + array[2].length + array[3].length}
                 },
                 index: 0
             } ];

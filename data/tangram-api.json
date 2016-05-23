@@ -206,6 +206,11 @@
     ],
     "values": [
         {
+            "address": "^/import$",
+            "type": "import",
+            "value": "*.yaml"
+        },
+        {
             "address": "^/scene/background/color$",
             "type": "color",
             "defaultValue": "[0., 0., 0.]"
