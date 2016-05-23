@@ -371,7 +371,7 @@ export function parseYamlString(string, state, tabSize) {
         // array[2] = "-\s*"
         // array[3] = value (if there is one)
         //
-        console.log(array)
+        
         //  If looks like an array element
         //  Calculate the number of spaces and indentation level
         let spaces = (array[1].match(/\s/g) || []).length;

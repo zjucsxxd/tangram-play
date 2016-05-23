@@ -26,7 +26,7 @@ export default class WidgetsManager {
             .then((data) => {
                 // Initialize tokens
                 for (let datum of data.values) {
-                    if (datum.type === 'color' || datum.type === 'vector' || datum.type === 'boolean' || datum.type === 'string') {
+                    if (datum.type === 'yaml' || datum.type === 'color' || datum.type === 'vector' || datum.type === 'boolean' || datum.type === 'string') {
                         this.data.push(new WidgetType(datum));
                     }
                 }

@@ -2,6 +2,7 @@ import ColorButton from './color-button';
 import ToggleButton from './toggle-button';
 import DropDownMenu from './drop-down-menu';
 import VectorButton from './vector-button';
+import YamlButton from './yaml-button';
 
 export default class WidgetType {
     constructor (datum) {
@@ -11,11 +12,11 @@ export default class WidgetType {
             'address',
         ];
 
+        this.matchList = [];
+
         for (const key of matchTypes) {
             if (datum[key]) {
-                this.matchAgainst = key;
-                this.matchPattern = datum[key];
-                break;
+                this.matchList.push( { against: key, pattern: datum[key] } );
             }
         }
 
@@ -25,12 +26,16 @@ export default class WidgetType {
     }
 
     match (keyPair) {
-        if (this.matchAgainst) {
-            return RegExp(this.matchPattern).test(keyPair[this.matchAgainst]);
+        let test = false;
+        for (let matchPair of this.matchList) {
+            if (!RegExp(matchPair.pattern).test(keyPair[matchPair.against])) {
+                return false;
+            }
+            else {
+                test = true;
+            }
         }
-        else {
-            return false;
-        }
+        return test;
     }
 
     create (keyPair) {
@@ -48,6 +53,9 @@ export default class WidgetType {
                 break;
             case 'vector':
                 widgetObj = new VectorButton(this, keyPair);
+                break;
+            case 'yaml':
+                widgetObj = new YamlButton(this, keyPair);
                 break;
             default:
                 // Nothing
