@@ -27,6 +27,8 @@ export default class ErrorModal extends React.Component {
 
     onClickClose() {
         this.component.unmount();
+        // After unmounting, `componentWillUnmount()` is called and the
+        // `confirmFunction()` will be executed.
     }
 
     render() {

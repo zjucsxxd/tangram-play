@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from './Modal';
 import Icon from '../components/Icon';
@@ -21,6 +22,9 @@ export default class OpenUrlModal extends React.Component {
     }
 
     componentDidMount() {
+        // Set initial input value and focus
+        // This allows modal to be opened with a prepopulated value
+        this.input.value = this.props.inputValue;
         this.input.focus();
     }
 
@@ -30,10 +34,19 @@ export default class OpenUrlModal extends React.Component {
             thinking: true,
         });
 
+        function errorHandler(error) {
+            console.log(error);
+            ReactDOM.render(<OpenUrlModal inputValue={error.url} />, document.getElementById('modal-container'));
+        }
+
         const url = this.input.value.trim();
-        load({ url })
+
+        load({ url }, errorHandler)
             .then(() => {
-                this.component.unmount();
+                // If nothing has gotten rid of this modal yet, get rid of it
+                if (this.component) {
+                    this.component.unmount();
+                }
             });
     }
 
@@ -97,4 +110,12 @@ export default class OpenUrlModal extends React.Component {
             </Modal>
         );
     }
+}
+
+OpenUrlModal.propTypes = {
+    inputValue: React.PropTypes.string,
+}
+
+OpenUrlModal.defaultProps = {
+    inputValue: '',
 }

@@ -154,9 +154,14 @@ function doLoadProcess(scene) {
     return tangramLayer.scene.initializing;
 }
 
-function onLoadError(error) {
+function onLoadError(error, errorHandler) {
+    function confirmFunction() {
+        if (errorHandler && typeof errorHandler === 'function') {
+            errorHandler(error);
+        }
+    }
     ReactDOM.render(
-        <ErrorModal error={error.message} />,
+        <ErrorModal error={error.message} confirmFunction={confirmFunction} />,
         document.getElementById('modal-container')
     );
     hideSceneLoadingIndicator();
@@ -182,10 +187,12 @@ function onLoadError(error) {
  *      scene.contents - Tangram YAML as a text blob
  *      Do not pass in both! Currently `url` takes priority, but
  *      this is not guaranteed behaviour.
+ * @param {Function} errorHandler - a function that is executed if loading
+ *      results in an error. Called after dismissing the error modal.
  * @returns {Promise} A promise which is resolved when a scene's
  *      contents has been fetched.
  */
-export function load(scene) {
+export function load(scene, errorHandler) {
     EventEmitter.dispatch('tangram:clear-palette', {});
 
     // Turn on loading indicator. This is turned off later
@@ -221,10 +228,17 @@ export function load(scene) {
 
         return fetchPromise.then(response => {
             if (!response.ok) {
+                const errorObj = {
+                    status: response.status,
+                    url: sceneUrl,
+                };
+
                 if (response.status === 404) {
-                    throw new Error('The scene you requested could not be found.');
+                    errorObj.message = 'The scene you requested could not be found.';
+                    throw errorObj;
                 } else {
-                    throw new Error('Something went wrong loading the scene!');
+                    errorObj.message = 'Something went wrong loading the scene!';
+                    throw errorObj;
                 }
             }
 
@@ -232,7 +246,10 @@ export function load(scene) {
         })
         .then(contents => doLoadProcess({ url: sceneUrl, contents }))
         .catch(error => {
-            onLoadError(error);
+            onLoadError(error, errorHandler);
+
+            // Rethrow the error so it can be caught by the original caller of load()
+            throw error;
         });
     } else if (scene.contents) {
         // If scene contents are provided, no asynchronous work is
