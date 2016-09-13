@@ -5,6 +5,8 @@ import 'whatwg-fetch';
 // React
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
 // Libraries
 import Raven from 'raven-js';
@@ -12,6 +14,9 @@ import localforage from 'localforage';
 
 // Components
 import App from './components/App';
+
+// Redux
+import appReducers from './store/reducers';
 
 // Miscellaneous
 import { migrateLocalStorageToForage } from './storage/migrate';
@@ -39,5 +44,13 @@ localforage.config({
 // TODO: Remove when migration is deemed unnecessary
 migrateLocalStorageToForage();
 
+// Initiate Redux store
+const store = createStore(appReducers);
+
 // Mount React components
-ReactDOM.render(<App />, document.getElementById('tangram-play-app'));
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('tangram-play-app')
+);
