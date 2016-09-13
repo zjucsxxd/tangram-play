@@ -1,9 +1,16 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { editor, getNodesForAddress } from './editor';
 import { tangramLayer } from '../map/map';
 import EventEmitter from '../components/event-emitter';
+import ErrorsPanel from '../components/ErrorsPanel';
 
 const lineWidgets = [];
 const blockErrors = new Set();
+const errorMessages = [];
+
+let x;
+let y;
 
 /**
  * Creates DOM element to be injected into the editor and display as an error.
@@ -19,6 +26,11 @@ function createErrorLineElement(type, message) {
         iconTypeClass = 'btm bt-exclamation-circle warning-icon';
     }
 
+    let displayText = message;
+    if (!displayText || displayText.length === 0) {
+        displayText = `Unspecified ${type}.`;
+    }
+
     const node = document.createElement('div');
     node.className = type;
 
@@ -26,7 +38,7 @@ function createErrorLineElement(type, message) {
     icon.className = iconTypeClass;
 
     node.appendChild(icon);
-    node.appendChild(document.createTextNode(message));
+    node.appendChild(document.createTextNode(displayText));
 
     return node;
 }
@@ -54,6 +66,7 @@ function clearAllErrors() {
     }
     lineWidgets.length = 0;
     blockErrors.clear();
+    errorMessages.length = 0;
 }
 
 /**
@@ -68,6 +81,7 @@ function addError(errorObj) {
             const line = errorObj.error.mark.line;
             const message = errorObj.error.reason;
             createLineWidget('error', line, message);
+            errorMessages.push({ type: 'error', message: message });
             break;
         }
         // case 'scene':
@@ -75,16 +89,24 @@ function addError(errorObj) {
             // errorObj contains these properties:
             //      `message` - handy error from Tangram
             //      `url` - the url that could not be loaded
-            // Unfortunately we do not have a line number on which the error exists
-            console.log(errorObj.message, errorObj.url);
+            // we do not have a line number on which the error exists
+            // import values are returned as fully qualified urls, so we cannot
+            // check the value itself
+            errorMessages.push({ type: 'error', message: errorObj.message });
             break;
         // Default case handles unknown error types or undefined types, which
         // can happen if Tangram Play itself (and not Tangram) throws an error
         // when Tangram is executing a Promise and catches a Tangram Play error.
         default:
-            console.log('unknown error', errorObj);
+            errorMessages.push({ type: 'error', message: errorObj.message });
             break;
     }
+
+    ReactDOM.render(<ErrorsPanel
+        x={200}
+        y={200}
+        errors={errorMessages}
+    />, document.getElementById('modal-container'));
 }
 
 function addWarning(errorObj) {
@@ -110,15 +132,14 @@ function addWarning(errorObj) {
 
                 const address = `styles:${style}:shaders:blocks:${block.name}`;
                 const node = getNodesForAddress(address);
+                const message = errors[i].message;
+
+                errorMessages.push({ type: 'warning', message: message });
 
                 if (node) {
                     const line = node.range.from.line + 1 + block.line;
-                    const message = errors[i].message;
                     createLineWidget('warning', line, message);
                     blockErrors.add(JSON.stringify(block)); // track unique errors
-                } else {
-                    // TODO: Report a general level error
-                    console.log('Node', address, 'was not found');
                 }
             }
 
@@ -126,6 +147,7 @@ function addWarning(errorObj) {
         }
         // Handle unknown warning types.
         default:
+            errorMessages.push({ type: 'warning', message: errorObj.message });
             break;
     }
 }
