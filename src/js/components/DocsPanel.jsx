@@ -14,18 +14,7 @@ import { editor } from '../editor/editor';
 
 import TANGRAM from '../tangram-docs.json';
 
-/**
- * Represents the main map panel that user can toggle in and out of the leaflet
- * map.
- */
 export default class DocsPanel extends React.Component {
-    /**
-     * Used to setup the state of the component. Regular ES6 classes do not
-     * automatically bind 'this' to the instance, therefore this is the best
-     * place to bind event handlers
-     *
-     * @param props - parameters passed from the parent
-     */
     constructor(props) {
         super(props);
 
@@ -204,10 +193,6 @@ export default class DocsPanel extends React.Component {
         return list;
     }
 
-    /**
-     * Official React lifecycle method
-     * Called every time state or props are changed
-     */
     render() {
         const divStyle = {
             height: `${this.state.height}px`,
